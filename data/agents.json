@@ -2,21 +2,21 @@
   {
     "name": "Bright Homes Lettings",
     "location": "London",
-    "rating": "A",
+    "google_rating": 4.0,
     "image": "https://via.placeholder.com/300x200?text=Agent+1",
     "trustpilot_rating": 4.2
   },
   {
     "name": "SafeStay Rentals",
     "location": "Manchester",
-    "rating": "B",
+    "google_rating": 3.5,
     "image": "https://via.placeholder.com/300x200?text=Agent+2",
     "trustpilot_rating": 3.8
   },
   {
     "name": "Prime Property Agents",
     "location": "Birmingham",
-    "rating": "A",
+    "google_rating": 4.1,
     "image": "https://via.placeholder.com/300x200?text=Agent+3",
     "trustpilot_rating": 2.9
   }
