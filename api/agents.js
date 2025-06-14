@@ -10,7 +10,7 @@ export default function handler(req, res) {
 
   // map to API shape
   const payload = agents.map((a, i) => {
-    const google = parseFloat(a.rating);
+    const google = parseFloat(a.google_rating);
     const tp     = parseFloat(a.trustpilot_rating);
     const avg    = (google + tp) / 2;
     let risk;
