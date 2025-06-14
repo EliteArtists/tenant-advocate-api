@@ -1,39 +1,43 @@
 // api/agents.js
-import { readFileSync } from 'fs';
-import { join } from 'path';
+import { supabase } from '../src/lib/supabaseClient.js';
 
-export default function handler(req, res) {
-  // load our sample data
-  const filePath = join(process.cwd(), 'data', 'agents.json');
-  const raw      = readFileSync(filePath, 'utf8');
-  const agents   = JSON.parse(raw);
-
-  // map to API shape & calculate risk
-  const payload = agents.map((a, i) => {
-    const google = parseFloat(a.google_rating);        // note: renamed field
-    const tp     = parseFloat(a.trustpilot_rating);
-    const avg    = (google + tp) / 2;
-    let risk;
-    if      (avg >= 4)    risk = 'Low';
-    else if (avg >= 3)    risk = 'Medium';
-    else                  risk = 'High';
-
-    return {
-      id:               i + 1,
-      name:             a.name,
-      location:         a.location,
-      imageUrl:         a.image,
-      googleRating:     google,
-      trustpilotRating: tp,
-      riskLevel:        risk
-    };
-  });
-
-  // ——— HERE are the CORS headers ———
+export default async function handler(req, res) {
+  // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
-  // finally, send the JSON
-  res.status(200).json(payload);
+  // handle preflight
+  if (req.method === 'OPTIONS') {
+    return res.status(204).end();
+  }
+
+  // ■ CREATE A NEW AGENT
+  if (req.method === 'POST') {
+    const { name, location, full_address, slug } = req.body;
+    const { data, error } = await supabase
+      .from('agents')
+      .insert({ name, location, full_address, slug })
+      .single();
+    if (error) {
+      return res.status(400).json({ error: error.message });
+    }
+    return res.status(201).json(data);
+  }
+
+  // ■ FETCH ALL AGENTS
+  if (req.method === 'GET') {
+    const { data, error } = await supabase
+      .from('agents')
+      .select('*')
+      .order('id', { ascending: true });
+    if (error) {
+      return res.status(500).json({ error: error.message });
+    }
+    return res.status(200).json(data);
+  }
+
+  // anything else is not allowed
+  res.setHeader('Allow', 'GET, POST, OPTIONS');
+  res.status(405).end(`Method ${req.method} Not Allowed`);
 }
