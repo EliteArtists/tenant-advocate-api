@@ -29,7 +29,7 @@ export default async function handler(req, res) {
   if (req.method === 'GET') {
     const { data, error } = await supabase
       .from('agents')
-      .select('*')
+      .select('id, name, location, slug, image_url, google_rating, trustpilot_rating')
       .order('id', { ascending: true });
     if (error) {
       return res.status(500).json({ error: error.message });
